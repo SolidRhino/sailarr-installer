@@ -61,16 +61,19 @@ The stack includes these services, configured based on your selections:
 
 **Note:** RDTClient is available in the compose files as legacy support but is not configured by the installer.
 
-### Optional Services
+### Additional Services
 
-- **[Traefik](https://traefik.io/)** - Reverse proxy with automatic HTTPS (optional)
-- **[Traefik Socket Proxy](https://github.com/Tecnativa/docker-socket-proxy)** - Security layer for Traefik
-- **[Watchtower](https://containrrr.dev/watchtower/)** - Automatic container updates (optional)
-- **[Tautulli](https://tautulli.com/)** - Plex monitoring and statistics (optional)
-- **[Homarr](https://homarr.dev/)** - Dashboard for all services (optional)
-- **[Dashdot](https://github.com/MauriceNino/dashdot)** - Server monitoring dashboard (optional)
-- **[Pinchflat](https://github.com/kieraneglin/pinchflat)** - YouTube downloader for Plex (optional)
-- **[Plex-Trakt-Sync](https://github.com/Taxel/PlexTraktSync)** - Sync Plex with Trakt.tv (optional)
+- **[Watchtower](https://containrrr.dev/watchtower/)** - Automatic container updates
+- **[Tautulli](https://tautulli.com/)** - Plex monitoring and statistics
+- **[Homarr](https://homarr.dev/)** - Dashboard for all services
+- **[Dashdot](https://github.com/MauriceNino/dashdot)** - Server monitoring dashboard
+- **[Pinchflat](https://github.com/kieraneglin/pinchflat)** - YouTube downloader for Plex
+- **[Plex-Trakt-Sync](https://github.com/Taxel/PlexTraktSync)** - Sync Plex with Trakt.tv
+
+### Optional Services (Configurable)
+
+- **[Traefik](https://traefik.io/)** - Reverse proxy with automatic HTTPS (optional, enable during setup)
+- **[Traefik Socket Proxy](https://github.com/Tecnativa/docker-socket-proxy)** - Security layer for Traefik (only if Traefik enabled)
 
 ## Installation Options
 
@@ -90,7 +93,7 @@ Download client is automatically set to Decypharr.
 
 ### 3. Traefik (Reverse Proxy)
 - **Enable/Disable** - Use Traefik for routing
-- **Domain/Hostname** - Your domain name if enabled
+- **Domain/Hostname** - Your domain name (only if Traefik enabled)
 
 ### 4. Automatic Configuration
 - **Auto-configure services** - Let installer set up all connections
@@ -110,10 +113,10 @@ After installation, access your services at different URLs depending on your con
 - **Overseerr:** `http://SERVER_IP:5055`
 - **Zilean:** `http://SERVER_IP:8181`
 - **Decypharr:** `http://SERVER_IP:8283`
-- **Tautulli:** `http://SERVER_IP:8181` (if installed)
-- **Homarr:** `http://SERVER_IP:7575` (if installed)
-- **Dashdot:** `http://SERVER_IP:3001` (if installed)
-- **Pinchflat:** `http://SERVER_IP:8945` (if installed)
+- **Tautulli:** `http://SERVER_IP:8181`
+- **Homarr:** `http://SERVER_IP:7575`
+- **Dashdot:** `http://SERVER_IP:3001`
+- **Pinchflat:** `http://SERVER_IP:8945`
 
 Replace `SERVER_IP` with your actual server IP address or hostname.
 
@@ -128,10 +131,10 @@ Services are accessible via subdomains of your configured domain:
 - **Overseerr:** `https://overseerr.YOUR_DOMAIN`
 - **Zilean:** `https://zilean.YOUR_DOMAIN`
 - **Decypharr:** `https://decypharr.YOUR_DOMAIN`
-- **Tautulli:** `https://tautulli.YOUR_DOMAIN` (if installed)
-- **Homarr:** `https://homarr.YOUR_DOMAIN` (if installed)
-- **Dashdot:** `https://dashdot.YOUR_DOMAIN` (if installed)
-- **Pinchflat:** `https://pinchflat.YOUR_DOMAIN` (if installed)
+- **Tautulli:** `https://tautulli.YOUR_DOMAIN`
+- **Homarr:** `https://homarr.YOUR_DOMAIN`
+- **Dashdot:** `https://dashdot.YOUR_DOMAIN`
+- **Pinchflat:** `https://pinchflat.YOUR_DOMAIN`
 - **Traefik Dashboard:** `https://traefik.YOUR_DOMAIN`
 
 Replace `YOUR_DOMAIN` with your configured domain name.
@@ -220,11 +223,12 @@ cd /YOUR_INSTALL_DIR
 │   ├── zilean-config/
 │   ├── zurg-config/
 │   ├── autoscan-config/
-│   ├── decypharr-config/  (if selected)
-│   ├── rdtclient-config/  (if selected)
-│   ├── traefik-config/    (if enabled)
-│   ├── tautulli-config/   (if installed)
-│   ├── homarr-config/     (if installed)
+│   ├── decypharr-config/
+│   ├── tautulli-config/
+│   ├── homarr-config/
+│   ├── dashdot-config/
+│   ├── pinchflat-config/
+│   ├── traefik-config/    # Only if Traefik enabled
 │   └── ...
 ├── data/               # Media and downloads
 │   ├── media/
@@ -232,13 +236,13 @@ cd /YOUR_INSTALL_DIR
 │   │   └── tv/        # Sonarr TV shows
 │   ├── torrents/      # Download client symlinks
 │   └── realdebrid-zurg/ # Rclone mount point
-├── logs/              # Health check logs (if enabled)
+├── logs/              # Health check logs
 ├── docker/            # Docker Compose files
 ├── setup.sh           # Installation script
 ├── recyclarr.yml      # TRaSH Guide configuration
 ├── recyclarr-sync.sh  # Manual profile update script
-├── arrs-mount-healthcheck.sh    (if installed)
-└── plex-mount-healthcheck.sh    (if installed)
+├── arrs-mount-healthcheck.sh
+└── plex-mount-healthcheck.sh
 ```
 
 ## Troubleshooting
