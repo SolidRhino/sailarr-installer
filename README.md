@@ -1,17 +1,19 @@
 # Sailarr Installer
 
-Fully automated installation script for creating your own media server powered by Real-Debrid and the *Arr stack. One command setup with zero manual configuration required.
+Fully automated installation script for creating your own media server powered by Real-Debrid and the *Arr stack. One command setup with comprehensive configuration options.
 
 ## What is This?
 
-This installer deploys a complete media automation stack that streams content from Real-Debrid through Plex, using the *Arr applications (Radarr, Sonarr, Prowlarr) to manage your library. Everything is configured automatically - just run the script and start watching.
+This installer deploys a complete media automation stack that streams content from Real-Debrid through Plex, using the *Arr applications (Radarr, Sonarr, Prowlarr) to manage your library. The installer handles everything automatically based on your preferences.
 
 **Key Features:**
-- **One Command Installation** - Complete setup in minutes
+- **Fully Interactive Setup** - Configure exactly what you need
 - **Zero Manual Configuration** - All services automatically configured and connected
 - **TRaSH Guide Quality Profiles** - Industry-standard quality settings via Recyclarr
 - **Health Monitoring** - Automatic container restarts if issues are detected
-- **Flexible Download Clients** - Choose between RDTClient or Decypharr
+- **Multiple Download Clients** - Choose between RDTClient or Decypharr
+- **Optional Traefik Integration** - Reverse proxy with HTTPS support
+- **Authentication** - Optional password protection for all services
 
 ## Requirements
 
@@ -19,6 +21,7 @@ This installer deploys a complete media automation stack that streams content fr
 - **Real-Debrid:** Active subscription with [API token](https://real-debrid.com/apitoken)
 - **Docker & Docker Compose:** Must be installed before running the installer
 - **Storage:** 50GB+ available disk space
+- **Domain (optional):** Required only if using Traefik with HTTPS
 
 ## Quick Start
 
@@ -31,108 +34,196 @@ cd sailarr-installer
 ./setup.sh
 ```
 
-The installer will ask you four questions:
-1. Installation directory (default: `/mediacenter`)
-2. Real-Debrid API token
-3. Plex claim token (optional - for hardware access)
-4. Download client preference (RDTClient or Decypharr)
-
-Then it handles everything else automatically.
+The installer is fully interactive and will guide you through all configuration options.
 
 **📖 For detailed installation instructions, see [INSTALLATION.md](INSTALLATION.md)** - This guide explains each configuration option, what happens during installation, and how to troubleshoot common issues.
 
 ## What Gets Installed
 
-The stack includes these services, all automatically configured:
+The stack includes these services, configured based on your selections:
+
+### Core Services (Always Installed)
 
 - **[Plex](https://www.plex.tv/)** - Media streaming server
-- **[Radarr](https://radarr.video/)** - Movie management
-- **[Sonarr](https://sonarr.tv/)** - TV series management
-- **[Prowlarr](https://prowlarr.com/)** - Indexer management
-- **[Decypharr](https://github.com/enty8080/Decypharr)** or **[RDTClient](https://github.com/rogerfar/rdt-client)** - Download client with symlink support
+- **[Radarr](https://radarr.video/)** - Movie management and automation
+- **[Sonarr](https://sonarr.tv/)** - TV series management and automation
+- **[Prowlarr](https://prowlarr.com/)** - Indexer management for all *Arrs
 - **[Zurg](https://github.com/debridmediamanager/zurg-testing)** - Real-Debrid WebDAV server
 - **[Rclone](https://github.com/rclone/rclone)** - Mounts Zurg as local filesystem
 - **[Zilean](https://github.com/iPromKnight/zilean)** - Debrid Media Manager indexer
+- **[PostgreSQL](https://www.postgresql.org/)** - Database for Zilean
 - **[Overseerr](https://overseerr.dev/)** - Media request management
-- **[Autoscan](https://github.com/saltydk/autoscan)** - Plex library updates
+- **[Autoscan](https://github.com/saltydk/autoscan)** - Automatic Plex library updates
+
+### Download Client (Choose One)
+
+- **[Decypharr](https://github.com/enty8080/Decypharr)** - Lightweight, recommended for most users
+- **[RDTClient](https://github.com/rogerfar/rdt-client)** - Feature-rich with advanced web UI
+
+### Optional Services
+
+- **[Traefik](https://traefik.io/)** - Reverse proxy with automatic HTTPS (optional)
+- **[Traefik Socket Proxy](https://github.com/Tecnativa/docker-socket-proxy)** - Security layer for Traefik
+- **[Watchtower](https://containrrr.dev/watchtower/)** - Automatic container updates (optional)
+- **[Tautulli](https://tautulli.com/)** - Plex monitoring and statistics (optional)
+- **[Homarr](https://homarr.dev/)** - Dashboard for all services (optional)
+- **[Dashdot](https://github.com/MauriceNino/dashdot)** - Server monitoring dashboard (optional)
+- **[Pinchflat](https://github.com/kieraneglin/pinchflat)** - YouTube downloader for Plex (optional)
+- **[Plex-Trakt-Sync](https://github.com/Taxel/PlexTraktSync)** - Sync Plex with Trakt.tv (optional)
+
+## Installation Options
+
+During installation, you'll configure:
+
+### 1. Basic Configuration
+- **Installation Directory** - Where to install (default: `/mediacenter`)
+- **Timezone** - Server timezone (default: `Europe/Madrid`)
+- **Real-Debrid API Token** - Your Real-Debrid authentication
+- **Plex Claim Token** - Link Plex to your account (optional)
+
+### 2. Authentication
+- **Enable/Disable** - Password protect all services
+- **Username & Password** - If authentication enabled
+
+### 3. Traefik (Reverse Proxy)
+- **Enable/Disable** - Use Traefik for routing
+- **Domain/Hostname** - Your domain name if enabled
+
+### 4. Automatic Configuration
+- **Auto-configure services** - Let installer set up all connections
+- **Install health monitoring** - Auto-restart containers on mount failures
+- **Add cron jobs** - Scheduled health checks
+
+## Accessing Services
+
+After installation, access your services at different URLs depending on your configuration:
+
+### Without Traefik (Direct Access)
+
+- **Plex:** `http://SERVER_IP:32400/web`
+- **Radarr:** `http://SERVER_IP:7878`
+- **Sonarr:** `http://SERVER_IP:8989`
+- **Prowlarr:** `http://SERVER_IP:9696`
+- **Overseerr:** `http://SERVER_IP:5055`
+- **Zilean:** `http://SERVER_IP:8181`
+- **Decypharr:** `http://SERVER_IP:8181` (if selected)
+- **RDTClient:** `http://SERVER_IP:6500` (if selected)
+- **Tautulli:** `http://SERVER_IP:8181` (if installed)
+- **Homarr:** `http://SERVER_IP:7575` (if installed)
+- **Dashdot:** `http://SERVER_IP:3001` (if installed)
+- **Pinchflat:** `http://SERVER_IP:8945` (if installed)
+
+Replace `SERVER_IP` with your actual server IP address or hostname.
+
+### With Traefik Enabled
+
+Services are accessible via subdomains of your configured domain:
+
+- **Plex:** `https://plex.YOUR_DOMAIN`
+- **Radarr:** `https://radarr.YOUR_DOMAIN`
+- **Sonarr:** `https://sonarr.YOUR_DOMAIN`
+- **Prowlarr:** `https://prowlarr.YOUR_DOMAIN`
+- **Overseerr:** `https://overseerr.YOUR_DOMAIN`
+- **Zilean:** `https://zilean.YOUR_DOMAIN`
+- **Decypharr:** `https://decypharr.YOUR_DOMAIN` (if selected)
+- **RDTClient:** `https://rdtclient.YOUR_DOMAIN` (if selected)
+- **Tautulli:** `https://tautulli.YOUR_DOMAIN` (if installed)
+- **Homarr:** `https://homarr.YOUR_DOMAIN` (if installed)
+- **Dashdot:** `https://dashdot.YOUR_DOMAIN` (if installed)
+- **Pinchflat:** `https://pinchflat.YOUR_DOMAIN` (if installed)
+- **Traefik Dashboard:** `https://traefik.YOUR_DOMAIN`
+
+Replace `YOUR_DOMAIN` with your configured domain name.
+
+**Note:** If authentication is enabled, you'll be prompted for username/password when accessing any service.
 
 ## How It Works
 
 The workflow is completely automated:
 
-1. Request content through Overseerr
-2. Radarr/Sonarr search indexers via Prowlarr
-3. Zilean provides cached torrents from Debrid Media Manager
-4. Download client adds torrent to Real-Debrid
-5. Zurg exposes Real-Debrid library via WebDAV
-6. Rclone mounts Zurg as local filesystem
-7. Download client creates symlinks to mounted files
-8. Radarr/Sonarr import the symlinks
-9. Autoscan triggers Plex library refresh
-10. Stream instantly through Plex
+1. **Request** content through Overseerr
+2. **Search** - Radarr/Sonarr search indexers via Prowlarr
+3. **Find** - Zilean provides cached torrents from Debrid Media Manager
+4. **Add** - Download client adds torrent to Real-Debrid
+5. **Mount** - Zurg exposes Real-Debrid library via WebDAV
+6. **Access** - Rclone mounts Zurg as local filesystem
+7. **Link** - Download client creates symlinks to mounted files
+8. **Import** - Radarr/Sonarr import the symlinks
+9. **Scan** - Autoscan triggers Plex library refresh
+10. **Stream** - Watch instantly through Plex
 
 No actual downloading to local storage - everything streams from Real-Debrid.
 
 ## What the Installer Does
 
-### 1. System Preparation
-- Creates directory structure with correct permissions
-- Configures users and groups per Servarr Wiki best practices
-- Sets up file permissions (775/664, umask 002) for proper hardlinking
-- Generates configuration files from templates
+### 1. Configuration Collection
+- Asks all necessary questions
+- Validates input
+- Creates `.env.install` with your settings
+- Shows configuration summary for confirmation
 
-### 2. Service Deployment
-- Deploys all containers via Docker Compose
-- Waits for each service to become healthy
-- Automatically extracts API keys from configuration files
+### 2. System Preparation
+- Creates installation directory
+- Sets up user and group permissions
+- Creates required subdirectories
+- Generates all configuration files
 
-### 3. Automatic Configuration
-- **Prowlarr:** Adds Zilean indexer with correct settings
-- **Radarr/Sonarr:** Connects to Prowlarr, configures download client, sets root folders
-- **Download Client:** Configures Real-Debrid integration and symlink paths
-- **Quality Profiles:** Removes defaults, creates TRaSH Guide profiles (1080p, 2160p, Any)
-- **Recyclarr:** Syncs custom formats and naming conventions
+### 3. Service Deployment
+- Generates Docker Compose configuration
+- Pulls required Docker images
+- Starts containers in correct order
+- Waits for services to become healthy
 
-### 4. Health Monitoring
-- Installs cron jobs to check mount health every 30-35 minutes
-- Automatically restarts containers if mounts fail
-- Logs health checks to `/mediacenter/logs/`
+### 4. Automatic Configuration
+If enabled, the installer:
+- Extracts API keys from services
+- Configures Prowlarr with Zilean indexer
+- Connects Radarr/Sonarr to Prowlarr
+- Sets up download client in Radarr/Sonarr
+- Configures Real-Debrid settings
+- Sets root folders for media
+- Removes default quality profiles
+- Creates TRaSH Guide quality profiles via Recyclarr
 
-## Accessing Services
-
-After installation completes, access your services at:
-
-- **Plex:** `http://YOUR_SERVER_IP:32400/web`
-- **Radarr:** `http://YOUR_SERVER_IP:7878`
-- **Sonarr:** `http://YOUR_SERVER_IP:8989`
-- **Prowlarr:** `http://YOUR_SERVER_IP:9696`
-- **Overseerr:** `http://YOUR_SERVER_IP:5055`
-
-All inter-service connections are already configured.
+### 5. Health Monitoring
+If enabled:
+- Installs health check scripts
+- Creates cron jobs for automatic monitoring
+- Sets up logging
 
 ## Quality Profiles
 
 Three TRaSH Guide profiles are automatically created:
 
-- **Recyclarr-1080p** - Accepts HD content, upgrades to Remux-1080p
-- **Recyclarr-2160p** - Accepts 4K content, upgrades to Remux-2160p
-- **Recyclarr-Any** - Accepts any quality, upgrades to best available
+- **Recyclarr-1080p** - HD content, upgrades to Remux-1080p
+- **Recyclarr-2160p** - 4K content, upgrades to Remux-2160p
+- **Recyclarr-Any** - Any quality, upgrades to best available
 
 To manually update profiles after installation:
 
 ```bash
-cd /mediacenter
+cd /YOUR_INSTALL_DIR
 ./recyclarr-sync.sh
 ```
 
 ## Directory Structure
 
 ```
-/mediacenter/
+/YOUR_INSTALL_DIR/
 ├── config/              # Application configurations
 │   ├── plex-config/
 │   ├── radarr-config/
 │   ├── sonarr-config/
+│   ├── prowlarr-config/
+│   ├── overseerr-config/
+│   ├── zilean-config/
+│   ├── zurg-config/
+│   ├── autoscan-config/
+│   ├── decypharr-config/  (if selected)
+│   ├── rdtclient-config/  (if selected)
+│   ├── traefik-config/    (if enabled)
+│   ├── tautulli-config/   (if installed)
+│   ├── homarr-config/     (if installed)
 │   └── ...
 ├── data/               # Media and downloads
 │   ├── media/
@@ -140,8 +231,13 @@ cd /mediacenter
 │   │   └── tv/        # Sonarr TV shows
 │   ├── torrents/      # Download client symlinks
 │   └── realdebrid-zurg/ # Rclone mount point
-├── logs/              # Health check logs
-└── docker/            # Docker Compose files
+├── logs/              # Health check logs (if enabled)
+├── docker/            # Docker Compose files
+├── setup.sh           # Installation script
+├── recyclarr.yml      # TRaSH Guide configuration
+├── recyclarr-sync.sh  # Manual profile update script
+├── arrs-mount-healthcheck.sh    (if installed)
+└── plex-mount-healthcheck.sh    (if installed)
 ```
 
 ## Troubleshooting
@@ -154,29 +250,79 @@ docker ps -a
 ### View Container Logs
 ```bash
 docker logs <container_name>
+
+# Examples:
+docker logs plex
+docker logs radarr
+docker logs zurg
 ```
 
 ### Restart All Services
 ```bash
-cd /mediacenter/docker
+cd /YOUR_INSTALL_DIR/docker
 docker compose restart
 ```
 
 ### Check Mount Health
 ```bash
-tail -f /mediacenter/logs/plex-mount-healthcheck.log
-tail -f /mediacenter/logs/arrs-mount-healthcheck.log
+tail -f /YOUR_INSTALL_DIR/logs/plex-mount-healthcheck.log
+tail -f /YOUR_INSTALL_DIR/logs/arrs-mount-healthcheck.log
 ```
 
 ### Common Issues
 
 **Containers won't start:** Check Docker logs and verify Real-Debrid API token is valid
 
-**No search results:** Wait for Zilean to populate its database (can take 1-2 hours initially)
+**No search results:** Wait for Zilean to populate its database (1-2 hours initially)
 
 **Files not appearing:** Check mount health logs and verify rclone container is healthy
 
 **Permission errors:** Verify directory ownership matches configured UIDs/GIDs
+
+**Traefik 404 errors:** Ensure DNS is pointing to your server and containers are healthy
+
+## Maintenance
+
+### Update Containers
+
+```bash
+cd /YOUR_INSTALL_DIR/docker
+docker compose pull
+docker compose up -d
+```
+
+Or enable Watchtower during installation for automatic updates.
+
+### View Logs
+
+```bash
+# All containers
+cd /YOUR_INSTALL_DIR/docker
+docker compose logs -f
+
+# Specific container
+docker logs -f <container_name>
+```
+
+### Backup Configuration
+
+```bash
+# Backup entire config directory
+tar -czf mediacenter-backup-$(date +%Y%m%d).tar.gz /YOUR_INSTALL_DIR/config/
+```
+
+## Re-running the Installer
+
+If you need to change configuration or reinstall:
+
+```bash
+# The installer will detect existing .env.install and ask if you want to reuse it
+./setup.sh
+
+# To start fresh, delete the existing configuration:
+rm .env.install
+./setup.sh
+```
 
 ## Development
 
@@ -196,7 +342,7 @@ This project builds upon the excellent work of many in the community:
 - **[Debrid Media Manager](https://github.com/debridmediamanager/debrid-media-manager)** - Torrent caching platform
 - **[dreulavelle/Prowlarr-Indexers](https://github.com/dreulavelle/Prowlarr-Indexers)** - Custom Prowlarr indexer definitions
 
-And all the developers of the tools in this stack: Plex, Radarr, Sonarr, Prowlarr, Overseerr, Zurg, Rclone, Zilean, Decypharr, RDTClient, and Autoscan.
+And all the developers of the tools in this stack: Plex, Radarr, Sonarr, Prowlarr, Overseerr, Zurg, Rclone, Zilean, Decypharr, RDTClient, Autoscan, Traefik, Watchtower, Tautulli, Homarr, Dashdot, Pinchflat, and Plex-Trakt-Sync.
 
 ## License
 
