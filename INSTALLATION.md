@@ -56,7 +56,7 @@ The installer will now guide you through the configuration process.
 
 ## Configuration Questions
 
-The installer will ask you four questions. Here's what each one means and how to answer:
+The installer will ask you several configuration questions. Here's what each one means and how to answer:
 
 ### Question 1: Installation Directory
 
@@ -109,7 +109,7 @@ Enter your Real-Debrid API token (get it from https://real-debrid.com/apitoken):
 
 **What uses this token:**
 - Zurg: To mount your Real-Debrid library
-- Download client (Decypharr/RDTClient): To add torrents to Real-Debrid
+- Decypharr: To add torrents to Real-Debrid
 
 ### Question 3: Plex Claim Token (Optional)
 
@@ -146,68 +146,86 @@ Press Enter to skip if you don't want to claim the server now.
 2. Logging in with your Plex account
 3. Following the setup wizard
 
-### Question 4: Download Client Selection
+### Question 4: Timezone
 
 ```
-Select download client:
-1) Decypharr (recommended - lightweight, fast)
-2) RDTClient (feature-rich web UI)
-Enter choice (1 or 2):
+Enter timezone [press Enter for default]:
 ```
 
-**What it does:** The download client manages torrents with Real-Debrid and creates symlinks for Radarr/Sonarr.
+**What it does:** Sets the timezone for all containers and log timestamps.
 
-#### Option 1: Decypharr (Recommended)
+**Default:** `Europe/Madrid`
 
-**Pros:**
+**How to find your timezone:**
+- Use the format `Continent/City` (e.g., `America/New_York`, `Asia/Tokyo`)
+- Check available timezones: `timedatectl list-timezones`
+
+### Question 5: Authentication (Optional)
+
+```
+Do you want to configure authentication? (y/n):
+```
+
+**What it does:** Enables password protection for all services when using Traefik.
+
+**When to enable:**
+- You're exposing services to the internet
+- You want an extra security layer
+- Multiple users will access the server
+
+**When to skip:**
+- Only accessing locally on your network
+- You have other security measures (VPN, firewall)
+- Testing/development environment
+
+**If enabled, you'll be asked:**
+- **Username:** Your login username
+- **Password:** Your password (hidden when typing)
+
+### Question 6: Traefik (Reverse Proxy)
+
+```
+Do you want to enable Traefik? (y/n):
+```
+
+**What it does:** Enables Traefik reverse proxy with automatic HTTPS support.
+
+**Benefits:**
+- Access services via subdomains (e.g., `radarr.yourdomain.com`)
+- Automatic HTTPS certificates
+- Single entry point for all services
+- Better security with authentication
+
+**Requirements:**
+- A domain name pointing to your server
+- Ports 80 and 443 open on your firewall
+
+**If enabled, you'll be asked:**
+- **Domain/Hostname:** Your domain name (e.g., `mediacenter.example.com`)
+
+**When to enable:**
+- You have a domain name
+- You want HTTPS access
+- You're accessing services remotely
+
+**When to skip:**
+- Local network only
+- Don't have a domain
+- Prefer direct port access
+
+### Download Client
+
+**The installer automatically uses Decypharr** as the download client.
+
+**About Decypharr:**
 - Lightweight and fast
 - Lower resource usage
-- Simpler configuration
-- Works great with Real-Debrid
+- Handles Real-Debrid integration seamlessly
+- Creates symlinks automatically
 
-**Cons:**
-- Minimal web interface
-- Fewer advanced features
+**Web UI:** `http://YOUR_SERVER_IP:8283`
 
-**Best for:**
-- Most users
-- Limited system resources
-- Simple setups
-- When you just want it to work
-
-**Web UI:** `http://YOUR_SERVER_IP:8181`
-
-#### Option 2: RDTClient
-
-**Pros:**
-- Full-featured web interface
-- Advanced torrent management
-- Detailed statistics and logs
-- More configuration options
-
-**Cons:**
-- Higher resource usage
-- More complex to configure manually
-- Overkill for most use cases
-
-**Best for:**
-- Power users
-- Those who want detailed control
-- Monitoring torrent status closely
-- Managing multiple download categories
-
-**Web UI:** `http://YOUR_SERVER_IP:6500`
-
-**Which should you choose?**
-- **First time user?** Choose Decypharr (option 1)
-- **Want simple and reliable?** Choose Decypharr (option 1)
-- **Need advanced features?** Choose RDTClient (option 2)
-
-**Can you change it later?** Yes, but you'll need to:
-1. Stop the stack: `docker compose down`
-2. Edit your configuration
-3. Restart: `docker compose up -d`
-4. Reconfigure Radarr/Sonarr download client settings
+**Note:** RDTClient is available in the compose files as legacy support but is not configured by the installer. If you need RDTClient, you'll have to configure it manually after installation.
 
 ## Installation Process
 
@@ -237,9 +255,12 @@ After answering all questions, the installer will:
 - Sonarr (TV Shows)
 - Prowlarr (Indexers)
 - Zilean (DMM Indexer)
-- Decypharr or RDTClient (Download client)
+- PostgreSQL (Zilean database)
+- Decypharr (Download client)
 - Overseerr (Request management)
 - Autoscan (Library updates)
+- Traefik (if enabled)
+- Optional services (if selected)
 
 ### 4. Extract API Keys (30 seconds)
 - Waits for services to generate API keys
@@ -255,21 +276,21 @@ After answering all questions, the installer will:
 
 #### Radarr Configuration
 - Adds Prowlarr as indexer source
-- Configures download client (Decypharr or RDTClient)
+- Configures Decypharr as download client
 - Sets root folder to `/data/media/movies`
-- Configures Real-Debrid settings
+- Configures quality profiles
 
 #### Sonarr Configuration
 - Adds Prowlarr as indexer source
-- Configures download client (Decypharr or RDTClient)
+- Configures Decypharr as download client
 - Sets root folder to `/data/media/tv`
-- Configures Real-Debrid settings
+- Configures quality profiles
 
-#### Download Client Configuration
+#### Decypharr Configuration
 - Sets up Real-Debrid API token
 - Configures symlink paths
 - Sets minimum file size filters
-- Enables instant availability mode
+- Configures mount paths for Zurg/Rclone
 
 ### 6. Quality Profiles (30 seconds)
 - Removes all default quality profiles
@@ -298,26 +319,51 @@ You should see all services with status "Up" and "healthy".
 
 ### Access Your Services
 
-- **Plex:** http://YOUR_SERVER_IP:32400/web
-- **Radarr:** http://YOUR_SERVER_IP:7878
-- **Sonarr:** http://YOUR_SERVER_IP:8989
-- **Prowlarr:** http://YOUR_SERVER_IP:9696
-- **Overseerr:** http://YOUR_SERVER_IP:5055
-- **Decypharr:** http://YOUR_SERVER_IP:8181 (if selected)
-- **RDTClient:** http://YOUR_SERVER_IP:6500 (if selected)
+Access URLs depend on whether you enabled Traefik or not.
+
+#### Without Traefik (Direct Port Access)
+
+- **Plex:** `http://YOUR_SERVER_IP:32400/web`
+- **Radarr:** `http://YOUR_SERVER_IP:7878`
+- **Sonarr:** `http://YOUR_SERVER_IP:8989`
+- **Prowlarr:** `http://YOUR_SERVER_IP:9696`
+- **Overseerr:** `http://YOUR_SERVER_IP:5055`
+- **Zilean:** `http://YOUR_SERVER_IP:8181`
+- **Decypharr:** `http://YOUR_SERVER_IP:8283`
+
+Replace `YOUR_SERVER_IP` with your server's IP address.
+
+#### With Traefik Enabled
+
+All services are accessible via subdomains:
+
+- **Plex:** `https://plex.YOUR_DOMAIN`
+- **Radarr:** `https://radarr.YOUR_DOMAIN`
+- **Sonarr:** `https://sonarr.YOUR_DOMAIN`
+- **Prowlarr:** `https://prowlarr.YOUR_DOMAIN`
+- **Overseerr:** `https://overseerr.YOUR_DOMAIN`
+- **Zilean:** `https://zilean.YOUR_DOMAIN`
+- **Decypharr:** `https://decypharr.YOUR_DOMAIN`
+- **Traefik Dashboard:** `https://traefik.YOUR_DOMAIN`
+
+Replace `YOUR_DOMAIN` with the domain you configured during installation.
+
+**Note:** If you enabled authentication, you'll be prompted for username/password when accessing services through Traefik.
 
 ### Initial Setup Tasks
 
-1. **Overseerr Setup:**
-   - Open Overseerr
-   - Connect to your Plex server
-   - Configure Radarr and Sonarr connections
-   - Set up user access
-
-2. **Plex Library Setup:**
+1. **Plex Library Setup:**
+   - Access Plex at your configured URL
    - Add movie library: `/data/media/movies`
    - Add TV library: `/data/media/tv`
    - Configure metadata preferences
+   - Set library scanner to run automatically
+
+2. **Overseerr Setup:**
+   - Open Overseerr
+   - Connect to your Plex server
+   - Configure Radarr and Sonarr connections
+   - Set up user access and permissions
 
 3. **Wait for Zilean:**
    - Zilean needs to populate its database
