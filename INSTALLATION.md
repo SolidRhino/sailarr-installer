@@ -213,6 +213,14 @@ Do you want to enable Traefik? (y/n):
 - Don't have a domain
 - Prefer direct port access
 
+**Important:** The installer only configures Traefik and the containers. You must handle these network configurations yourself:
+- **DNS:** Create DNS A/AAAA records pointing your domain/subdomains to your server's public IP
+- **Port Forwarding:** Configure your router to forward ports 80 and 443 to your server
+- **Firewall:** Ensure your firewall allows incoming traffic on ports 80 and 443
+- **Domain Ownership:** You must own or control the domain you configure
+
+These networking requirements are outside the scope of this installer.
+
 ### Download Client
 
 **The installer automatically uses Decypharr** as the download client.

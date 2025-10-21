@@ -75,6 +75,12 @@ The stack includes these services, configured based on your selections:
 - **[Traefik](https://traefik.io/)** - Reverse proxy with automatic HTTPS (optional, enable during setup)
 - **[Traefik Socket Proxy](https://github.com/Tecnativa/docker-socket-proxy)** - Security layer for Traefik (only if Traefik enabled)
 
+**Note about Traefik:** While the installer configures Traefik and all containers for reverse proxy access, additional network configuration is required on your end:
+- DNS records pointing your domain to your server
+- Port forwarding (80, 443) on your router/firewall
+- Proper firewall rules
+- These networking aspects are not covered by this installer and must be configured manually
+
 ## Installation Options
 
 During installation, you'll configure:
