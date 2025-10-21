@@ -11,7 +11,7 @@ This installer deploys a complete media automation stack that streams content fr
 - **Zero Manual Configuration** - All services automatically configured and connected
 - **TRaSH Guide Quality Profiles** - Industry-standard quality settings via Recyclarr
 - **Health Monitoring** - Automatic container restarts if issues are detected
-- **Multiple Download Clients** - Choose between RDTClient or Decypharr
+- **Decypharr Integration** - Lightweight Real-Debrid download client with symlink support
 - **Optional Traefik Integration** - Reverse proxy with HTTPS support
 - **Authentication** - Optional password protection for all services
 
@@ -20,7 +20,7 @@ This installer deploys a complete media automation stack that streams content fr
 - **Server:** Ubuntu 20.04+ or Debian 11+ (8GB RAM minimum, 16GB recommended)
 - **Real-Debrid:** Active subscription with [API token](https://real-debrid.com/apitoken)
 - **Docker & Docker Compose:** Must be installed before running the installer
-- **Storage:** 50GB+ available disk space
+- **Storage:** 20GB+ available disk space (minimal, 50GB+ recommended)
 - **Domain (optional):** Required only if using Traefik with HTTPS
 
 ## Quick Start
@@ -55,10 +55,11 @@ The stack includes these services, configured based on your selections:
 - **[Overseerr](https://overseerr.dev/)** - Media request management
 - **[Autoscan](https://github.com/saltydk/autoscan)** - Automatic Plex library updates
 
-### Download Client (Choose One)
+### Download Client
 
-- **[Decypharr](https://github.com/enty8080/Decypharr)** - Lightweight, recommended for most users
-- **[RDTClient](https://github.com/rogerfar/rdt-client)** - Feature-rich with advanced web UI
+- **[Decypharr](https://github.com/enty8080/Decypharr)** - Lightweight and fast, handles Real-Debrid integration
+
+**Note:** RDTClient is available in the compose files as legacy support but is not configured by the installer.
 
 ### Optional Services
 
@@ -80,6 +81,8 @@ During installation, you'll configure:
 - **Timezone** - Server timezone (default: `Europe/Madrid`)
 - **Real-Debrid API Token** - Your Real-Debrid authentication
 - **Plex Claim Token** - Link Plex to your account (optional)
+
+Download client is automatically set to Decypharr.
 
 ### 2. Authentication
 - **Enable/Disable** - Password protect all services
@@ -106,8 +109,7 @@ After installation, access your services at different URLs depending on your con
 - **Prowlarr:** `http://SERVER_IP:9696`
 - **Overseerr:** `http://SERVER_IP:5055`
 - **Zilean:** `http://SERVER_IP:8181`
-- **Decypharr:** `http://SERVER_IP:8181` (if selected)
-- **RDTClient:** `http://SERVER_IP:6500` (if selected)
+- **Decypharr:** `http://SERVER_IP:8283`
 - **Tautulli:** `http://SERVER_IP:8181` (if installed)
 - **Homarr:** `http://SERVER_IP:7575` (if installed)
 - **Dashdot:** `http://SERVER_IP:3001` (if installed)
@@ -125,8 +127,7 @@ Services are accessible via subdomains of your configured domain:
 - **Prowlarr:** `https://prowlarr.YOUR_DOMAIN`
 - **Overseerr:** `https://overseerr.YOUR_DOMAIN`
 - **Zilean:** `https://zilean.YOUR_DOMAIN`
-- **Decypharr:** `https://decypharr.YOUR_DOMAIN` (if selected)
-- **RDTClient:** `https://rdtclient.YOUR_DOMAIN` (if selected)
+- **Decypharr:** `https://decypharr.YOUR_DOMAIN`
 - **Tautulli:** `https://tautulli.YOUR_DOMAIN` (if installed)
 - **Homarr:** `https://homarr.YOUR_DOMAIN` (if installed)
 - **Dashdot:** `https://dashdot.YOUR_DOMAIN` (if installed)
@@ -144,10 +145,10 @@ The workflow is completely automated:
 1. **Request** content through Overseerr
 2. **Search** - Radarr/Sonarr search indexers via Prowlarr
 3. **Find** - Zilean provides cached torrents from Debrid Media Manager
-4. **Add** - Download client adds torrent to Real-Debrid
+4. **Add** - Decypharr adds torrent to Real-Debrid
 5. **Mount** - Zurg exposes Real-Debrid library via WebDAV
 6. **Access** - Rclone mounts Zurg as local filesystem
-7. **Link** - Download client creates symlinks to mounted files
+7. **Link** - Decypharr creates symlinks to mounted files
 8. **Import** - Radarr/Sonarr import the symlinks
 9. **Scan** - Autoscan triggers Plex library refresh
 10. **Stream** - Watch instantly through Plex
@@ -179,8 +180,8 @@ If enabled, the installer:
 - Extracts API keys from services
 - Configures Prowlarr with Zilean indexer
 - Connects Radarr/Sonarr to Prowlarr
-- Sets up download client in Radarr/Sonarr
-- Configures Real-Debrid settings
+- Sets up Decypharr as download client in Radarr/Sonarr
+- Configures Real-Debrid settings in Decypharr
 - Sets root folders for media
 - Removes default quality profiles
 - Creates TRaSH Guide quality profiles via Recyclarr

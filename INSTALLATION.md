@@ -8,7 +8,7 @@ Before starting the installation, ensure you have:
 
 1. **A server running Ubuntu 20.04+ or Debian 11+**
    - Minimum 8GB RAM (16GB recommended)
-   - At least 50GB free disk space
+   - At least 20GB free disk space (50GB+ recommended)
    - Root or sudo access
 
 2. **Docker and Docker Compose installed**
