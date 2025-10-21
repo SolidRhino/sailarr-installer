@@ -157,7 +157,7 @@ Enter timezone [press Enter for default]:
 **Default:** `Europe/Madrid`
 
 **How to find your timezone:**
-- Use the format `Continent/City` (e.g., `America/New_York`, `Asia/Tokyo`)
+- Use the format `Continent/City` (e.g., `America/New_York`, `America/Los_Angeles`, `Asia/Tokyo`)
 - Check available timezones: `timedatectl list-timezones`
 
 ### Question 5: Authentication (Optional)

@@ -87,10 +87,10 @@ if [ "$SKIP_CONFIGURATION" = false ]; then
     # Ask for timezone
     echo "Timezone Configuration"
     echo "----------------------"
-    echo "Current default: ${TIMEZONE:-America/New_York}"
+    echo "Current default: ${TIMEZONE:-Europe/Madrid}"
     echo "Examples: Europe/Madrid, America/New_York, Asia/Tokyo"
     read -p "Enter timezone [press Enter for default]: " USER_TIMEZONE
-    USER_TIMEZONE=${USER_TIMEZONE:-${TIMEZONE:-America/New_York}}
+    USER_TIMEZONE=${USER_TIMEZONE:-${TIMEZONE:-Europe/Madrid}}
     echo ""
 
     # Ask for Real-Debrid token
