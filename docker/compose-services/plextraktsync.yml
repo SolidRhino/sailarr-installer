@@ -1,0 +1,31 @@
+# PlexTraktSync - Trakt.tv Integration
+
+services:
+  plextraktsync:
+    image: ${PLEXTRAKTSYNC_IMAGE}:${PLEXTRAKTSYNC_TAG}
+    env_file:
+      - ../.env.defaults
+      - ../.env.local
+    container_name: plextraktsync
+    networks:
+      mediacenter:
+        ipv4_address: 172.30.0.21
+    healthcheck:
+      test: ["CMD-SHELL", "test -f /config/config.yml || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+    environment:
+    - PUID=${PLEXTRAKTSYNC_UID}
+    - PGID=${MEDIACENTER_GID}
+    - TZ=${TIMEZONE}
+    - UMASK=002
+    volumes:
+    - ${ROOT_DIR}/config/plextraktsync-config:/config
+    restart: unless-stopped
+    depends_on:
+      plex:
+        condition: service_healthy
+        restart: true
+    cpus: '0.4'

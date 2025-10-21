@@ -1,0 +1,31 @@
+# Traefik Socket Proxy - Secure Docker API Access
+
+services:
+  traefik-socket-proxy:
+    profiles:
+      - traefik
+    image: ${TRAEFIK_SOCKET_PROXY_IMAGE}:${TRAEFIK_SOCKET_PROXY_TAG}
+    env_file:
+      - ../.env.defaults
+      - ../.env.local
+    container_name: traefik-socket-proxy
+    restart: unless-stopped
+    networks:
+      mediacenter:
+        ipv4_address: 172.30.0.2
+    ports:
+      - "127.0.0.1:${TRAEFIK_SOCKET_PROXY_PORT}:2375"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    environment:
+      - CONTAINERS=1
+      - SERVICES=1
+      - NETWORKS=1
+      - TASKS=1
+      - LOG_LEVEL=warning
+    healthcheck:
+      test: ["CMD", "nc", "-vz", "127.0.0.1", "2375"]
+      interval: 5s
+      timeout: 3s
+      retries: 3
+      start_period: 5s

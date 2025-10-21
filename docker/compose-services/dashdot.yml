@@ -1,0 +1,43 @@
+# DashDot - System Monitor
+
+services:
+  dashdot:
+    image: ${DASHDOT_IMAGE}:${DASHDOT_TAG}
+    env_file:
+      - ../.env.defaults
+      - ../.env.local
+    container_name: dashdot
+    cpus: 0.5
+    privileged: true
+    user: ${DASHDOT_UID}:${MEDIACENTER_GID}
+    restart: on-failure:5
+    networks:
+      mediacenter:
+        ipv4_address: 172.30.0.18
+    healthcheck:
+      test: ["CMD", "wget", "-q", "--spider", "http://localhost:3001"]
+      interval: 15s
+      timeout: 10s
+      retries: 5
+      start_period: 45s
+    tmpfs:
+    - /tmp:mode=770,noexec,size=30M
+    ports:
+    - ${DASHDOT_PORT}:3001
+    logging:
+      driver: local
+      options:
+        max-file: '3'
+        max-size: 5m
+    labels:
+    - traefik.enable=true
+    - traefik.http.routers.dashdot.rule=Host(`${DASHDOT_TRAEFIK_NAME}.${DOMAIN_NAME}`)
+    - traefik.http.routers.dashdot.entrypoints=web
+    - traefik.http.services.dashdot.loadbalancer.server.port=3001
+    volumes:
+    - /:/mnt/host:ro
+    environment:
+    - DASHDOT_ENABLE_CPU_TEMPS=true
+    - DASHDOT_OVERRIDE_OS=Ubuntu
+    - DASHDOT_WIDGET_LIST=os,cpu,storage,ram,network
+    - DASHDOT_ACCEPT_OOKLA_EULA=true

@@ -1,0 +1,9 @@
+# Volumes Configuration
+
+volumes:
+  zilean_tmp:
+    driver: local
+  zilean_postgres:
+    driver: local
+  zurg_data:
+    driver: local

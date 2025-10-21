@@ -1,0 +1,43 @@
+# Traefik - Reverse Proxy
+
+services:
+  traefik:
+    profiles:
+      - traefik
+    image: ${TRAEFIK_IMAGE}:${TRAEFIK_TAG}
+    env_file:
+      - ../.env.defaults
+      - ../.env.local
+    container_name: traefik
+    user: "${TRAEFIK_UID}:${MEDIACENTER_GID}"
+    restart: unless-stopped
+    networks:
+      mediacenter:
+        ipv4_address: 172.30.0.3
+    ports:
+      - "${TRAEFIK_PORT}:80"
+      - "${TRAEFIK_DASHBOARD_PORT}:8080"
+    command:
+      - "--api.insecure=true"
+      - "--providers.docker=true"
+      - "--providers.docker.endpoint=tcp://traefik-socket-proxy:2375"
+      - "--providers.docker.exposedbydefault=false"
+      - "--providers.docker.network=mediacenter"
+      - "--entrypoints.web.address=:80"
+      - "--log.level=INFO"
+      - "--accesslog=true"
+      - "--accesslog.filepath=/data/access.log"
+    volumes:
+      - ${ROOT_DIR}/config/traefik-data:/data
+      - ${ROOT_DIR}/config/traefik-config:/config
+    environment:
+      - TZ=${TIMEZONE}
+    healthcheck:
+      test: ["CMD", "nc", "-vz", "127.0.0.1", "80"]
+      start_period: 3s
+      interval: 3s
+      timeout: 3s
+      retries: 5
+    depends_on:
+      traefik-socket-proxy:
+        condition: service_healthy

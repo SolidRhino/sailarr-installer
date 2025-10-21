@@ -1,0 +1,49 @@
+# Sonarr - TV Show Management
+
+services:
+  sonarr:
+    image: ${SONARR_IMAGE}:${SONARR_TAG}
+    env_file:
+      - ../.env.defaults
+      - ../.env.local
+    container_name: sonarr
+    cpus: 1.0
+    user: ${SONARR_UID}:${MEDIACENTER_GID}
+    networks:
+      mediacenter:
+        ipv4_address: 172.30.0.8
+    healthcheck:
+      test: ["CMD", "curl", "--fail", "--silent", "--connect-timeout", "3", "http://localhost:8989/ping"]
+      interval: 5s
+      timeout: 4s
+      retries: 4
+      start_period: 5s
+    environment:
+    - PUID=${SONARR_UID}
+    - PGID=${MEDIACENTER_GID}
+    - UMASK=002
+    - TZ=${TIMEZONE}
+    - COMPlus_EnableDiagnostics=0
+    tmpfs:
+    - /tmp:mode=770,noexec,size=50M,uid=${SONARR_UID},gid=${MEDIACENTER_GID}
+    - /logs:mode=770,size=100M,uid=${SONARR_UID},gid=${MEDIACENTER_GID}
+    volumes:
+    - ${ROOT_DIR}/config/sonarr-config:/config
+    - ${ROOT_DIR}/data:/data
+    ports:
+    - ${SONARR_PORT}:8989
+    restart: on-failure:5
+    logging:
+      driver: local
+      options:
+        max-file: '5'
+        max-size: 10m
+    depends_on:
+      prowlarr:
+        condition: service_healthy
+        restart: true
+    labels:
+    - traefik.enable=true
+    - traefik.http.routers.sonarr.rule=Host(`${SONARR_TRAEFIK_NAME}.${DOMAIN_NAME}`)
+    - traefik.http.routers.sonarr.entrypoints=web
+    - traefik.http.services.sonarr.loadbalancer.server.port=8989

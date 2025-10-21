@@ -1,0 +1,43 @@
+# Tautulli - Plex Media Server Statistics
+
+services:
+  tautulli:
+    image: ${TAUTULLI_IMAGE}:${TAUTULLI_TAG}
+    env_file:
+      - ../.env.defaults
+      - ../.env.local
+    container_name: tautulli
+    networks:
+      mediacenter:
+        ipv4_address: 172.30.0.19
+    environment:
+      - PUID=${TAUTULLI_UID}
+      - PGID=${MEDIACENTER_GID}
+      - TZ=${TIMEZONE}
+      - UMASK=002
+    volumes:
+      - ${ROOT_DIR}/config/tautulli-config:/config
+      - ${ROOT_DIR}/config/plex-config/Library/Application Support/Plex Media Server/Logs:/logs:ro
+    ports:
+      - ${TAUTULLI_PORT}:8181
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "--fail", "--silent", "http://localhost:8181"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 60s
+    logging:
+      driver: local
+      options:
+        max-file: '3'
+        max-size: 10m
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.tautulli.rule=Host(`${TAUTULLI_TRAEFIK_NAME}.${DOMAIN_NAME}`)
+      - traefik.http.routers.tautulli.entrypoints=web
+      - traefik.http.services.tautulli.loadbalancer.server.port=8181
+    depends_on:
+      plex:
+        condition: service_healthy
+        restart: true

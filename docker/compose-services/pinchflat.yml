@@ -1,0 +1,48 @@
+# Pinchflat - YouTube Downloader
+
+services:
+  pinchflat:
+    image: ${PINCHFLAT_IMAGE}:${PINCHFLAT_TAG}
+    env_file:
+      - ../.env.defaults
+      - ../.env.local
+    container_name: pinchflat
+    cpus: 0.5
+    user: ${PINCHFLAT_UID}:${MEDIACENTER_GID}
+    networks:
+      mediacenter:
+        ipv4_address: 172.30.0.16
+    healthcheck:
+      test: ["CMD-SHELL", "timeout 10s bash -c ':> /dev/tcp/127.0.0.1/8945' || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 90s
+    environment:
+    - TZ=${TIMEZONE}
+    - PUID=${PINCHFLAT_UID}
+    - PGID=${MEDIACENTER_GID}
+    - UMASK=002
+    tmpfs:
+    - /tmp:mode=770,noexec,size=100M,uid=${PINCHFLAT_UID},gid=${MEDIACENTER_GID}
+    - /config/logs:mode=770,size=50M,uid=${PINCHFLAT_UID},gid=${MEDIACENTER_GID}
+    ports:
+    - ${PINCHFLAT_PORT}:8945
+    restart: on-failure:5
+    logging:
+      driver: local
+      options:
+        max-file: '3'
+        max-size: 10m
+    labels:
+    - traefik.enable=true
+    - traefik.http.routers.pinchflat.rule=Host(`${PINCHFLAT_TRAEFIK_NAME}.${DOMAIN_NAME}`)
+    - traefik.http.routers.pinchflat.entrypoints=web
+    - traefik.http.services.pinchflat.loadbalancer.server.port=8945
+    volumes:
+    - ${ROOT_DIR}/config/pinchflat-config:/config
+    - ${ROOT_DIR}/data/media/youtube:/downloads
+    depends_on:
+      plex:
+        condition: service_healthy
+        restart: true

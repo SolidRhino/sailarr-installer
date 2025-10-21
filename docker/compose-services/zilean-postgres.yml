@@ -1,0 +1,27 @@
+# PostgreSQL for Zilean
+
+services:
+  zilean-postgres:
+    image: ${POSTGRES_IMAGE}:${POSTGRES_TAG}
+    env_file:
+      - ../.env.defaults
+      - ../.env.local
+    container_name: zilean-postgres
+    networks:
+      mediacenter:
+        ipv4_address: 172.30.0.15
+    environment:
+      TZ: ${TIMEZONE}
+      PGDATA: /var/lib/postgresql/data/pgdata
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: zilean
+    volumes:
+    - zilean_postgres:/var/lib/postgresql/data/pgdata
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready --username=postgres --dbname=zilean --host=localhost --port=5432"]
+      start_period: 5s
+      interval: 5s
+      timeout: 4s
+      retries: 5

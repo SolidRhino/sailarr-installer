@@ -1,0 +1,46 @@
+# Homarr - Dashboard
+
+services:
+  homarr:
+    image: ${HOMARR_IMAGE}:${HOMARR_TAG}
+    env_file:
+      - ../.env.defaults
+      - ../.env.local
+    container_name: homarr
+    cpus: 0.3
+    networks:
+      mediacenter:
+        ipv4_address: 172.30.0.17
+    healthcheck:
+      test: ["CMD-SHELL", "ps aux | grep -v grep | grep -q next-server || exit 1"]
+      interval: 15s
+      timeout: 5s
+      retries: 3
+      start_period: 30s
+    environment:
+    - PUID=${HOMARR_UID}
+    - PGID=${MEDIACENTER_GID}
+    - TZ=${TIMEZONE}
+    - UMASK=002
+    - NODE_ENV=production
+    - DEFAULT_COLOR_SCHEME=dark
+    - SECRET_ENCRYPTION_KEY=15c253548d1f209f6f110e063ae7d7a93abdaf79b2581e7b6adfcc5231c976c0
+    tmpfs:
+    - /tmp:mode=770,noexec,size=30M,uid=${HOMARR_UID},gid=${MEDIACENTER_GID}
+    - /appdata/logs:mode=770,size=30M,uid=${HOMARR_UID},gid=${MEDIACENTER_GID}
+    ports:
+    - ${HOMARR_PORT}:${HOMARR_CONTAINER_PORT}
+    restart: on-failure:5
+    logging:
+      driver: local
+      options:
+        max-file: '3'
+        max-size: 5m
+    labels:
+    - traefik.enable=true
+    - traefik.http.routers.homarr.rule=Host(`${HOMARR_TRAEFIK_NAME}.${DOMAIN_NAME}`)
+    - traefik.http.routers.homarr.entrypoints=web
+    - traefik.http.services.homarr.loadbalancer.server.port=3000
+    volumes:
+    - /var/run/docker.sock:/var/run/docker.sock:ro
+    - ${ROOT_DIR}/config/homarr-config:/appdata

@@ -1,0 +1,53 @@
+# Overseerr - Request Management
+
+services:
+  overseerr:
+    image: ${OVERSEERR_IMAGE}:${OVERSEERR_TAG}
+    env_file:
+      - ../.env.defaults
+      - ../.env.local
+    container_name: overseerr
+    cpus: 0.5
+    user: ${OVERSEERR_UID}:${MEDIACENTER_GID}
+    networks:
+      mediacenter:
+        ipv4_address: 172.30.0.12
+    healthcheck:
+      test: ["CMD", "wget", "--quiet", "--timeout=3", "--tries=1", "--spider", "http://localhost:5055"]
+      interval: 5s
+      timeout: 4s
+      retries: 4
+      start_period: 5s
+    environment:
+    - PUID=${OVERSEERR_UID}
+    - PGID=${MEDIACENTER_GID}
+    - UMASK=002
+    - TZ=${TIMEZONE}
+    tmpfs:
+    - /tmp:mode=770,noexec,size=30M,uid=${OVERSEERR_UID},gid=${MEDIACENTER_GID}
+    - /app/config/logs:mode=770,size=50M,uid=${OVERSEERR_UID},gid=${MEDIACENTER_GID}
+    volumes:
+    - ${ROOT_DIR}/config/overseerr-config:/app/config
+    ports:
+    - ${OVERSEERR_PORT}:5055
+    restart: on-failure:5
+    logging:
+      driver: local
+      options:
+        max-file: '5'
+        max-size: 10m
+    labels:
+    - traefik.enable=true
+    - traefik.http.routers.overseerr.rule=Host(`${OVERSEERR_TRAEFIK_NAME}.${DOMAIN_NAME}`)
+    - traefik.http.routers.overseerr.entrypoints=web
+    - traefik.http.services.overseerr.loadbalancer.server.port=5055
+    depends_on:
+      sonarr:
+        condition: service_healthy
+        restart: true
+      radarr:
+        condition: service_healthy
+        restart: true
+      prowlarr:
+        condition: service_healthy
+        restart: true

@@ -1,0 +1,48 @@
+# RDTClient - Real-Debrid Download Client
+
+services:
+  rdtclient:
+    image: ${RDTCLIENT_IMAGE}:${RDTCLIENT_TAG}
+    env_file:
+      - ../.env.defaults
+      - ../.env.local
+    container_name: rdtclient
+    cpus: 1.0
+    networks:
+      mediacenter:
+        ipv4_address: 172.30.0.7
+    healthcheck:
+      test: ["CMD", "curl", "--fail", "http://localhost:6500"]
+      interval: 30s
+      timeout: 10s
+      retries: 10
+      start_period: 60s
+    environment:
+    - PUID=${RDTCLIENT_UID}
+    - PGID=${MEDIACENTER_GID}
+    - UMASK=002
+    - TZ=${TIMEZONE}
+    tmpfs:
+    - /tmp:mode=770,noexec,size=100M,uid=${RDTCLIENT_UID},gid=${MEDIACENTER_GID}
+    - /logs:mode=770,size=100M,uid=${RDTCLIENT_UID},gid=${MEDIACENTER_GID}
+    ports:
+    - ${RDTCLIENT_PORT}:6500
+    labels:
+    - traefik.enable=true
+    - traefik.http.routers.rdtclient.rule=Host(`${RDTCLIENT_TRAEFIK_NAME}.${DOMAIN_NAME}`)
+    - traefik.http.routers.rdtclient.entrypoints=web
+    - traefik.http.services.rdtclient.loadbalancer.server.port=6500
+    volumes:
+    - ${ROOT_DIR}/data:/data
+    - ${ROOT_DIR}/config/rdt-config:/data/db
+    - ${ROOT_DIR}/data/symlinks:/data/symlinks:rw
+    restart: on-failure:5
+    depends_on:
+      rclone:
+        condition: service_healthy
+        restart: true
+    logging:
+      driver: local
+      options:
+        max-file: '5'
+        max-size: 10m

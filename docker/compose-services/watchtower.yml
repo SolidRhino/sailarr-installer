@@ -1,0 +1,37 @@
+# Watchtower - Automatic Container Updates
+
+services:
+  watchtower:
+    image: ${WATCHTOWER_IMAGE}:${WATCHTOWER_TAG}
+    env_file:
+      - ../.env.defaults
+      - ../.env.local
+    container_name: watchtower
+    networks:
+      mediacenter:
+        ipv4_address: 172.30.0.4
+    environment:
+    - TZ=${TIMEZONE}
+    - WATCHTOWER_CLEANUP=true
+    - WATCHTOWER_REMOVE_VOLUMES=true
+    - WATCHTOWER_INCLUDE_RESTARTING=true
+    - WATCHTOWER_INCLUDE_STOPPED=false
+    - WATCHTOWER_REVIVE_STOPPED=false
+    - WATCHTOWER_SCHEDULE=0 0 4 * * *
+    - WATCHTOWER_LABEL_ENABLE=false
+    - WATCHTOWER_MONITOR_ONLY=false
+    - WATCHTOWER_LABEL_TAKE_PRECEDENCE=false
+    - WATCHTOWER_NO_RESTART=false
+    - WATCHTOWER_NO_PULL=false
+    - WATCHTOWER_NO_STARTUP_MESSAGE=false
+    - WATCHTOWER_RUN_ONCE=false
+    - WATCHTOWER_HTTP_API_UPDATE=false
+    - WATCHTOWER_HTTP_API_PERIODIC_POLLS=false
+    - WATCHTOWER_HTTP_API_METRICS=false
+    - WATCHTOWER_ROLLING_RESTART=true
+    volumes:
+    - /var/run/docker.sock:/var/run/docker.sock:ro
+    depends_on:
+      plex:
+        condition: service_healthy
+        restart: true

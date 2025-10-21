@@ -1,0 +1,61 @@
+# Decypharr - Real-Debrid Download Client
+# Alternative to RDT Client with built-in repair worker and better mount handling
+
+services:
+  decypharr:
+    image: ${DECYPHARR_IMAGE}:${DECYPHARR_TAG}
+    env_file:
+      - ../.env.defaults
+      - ../.env.local
+    container_name: decypharr
+    cpus: 1.0
+    networks:
+      mediacenter:
+        ipv4_address: 172.30.0.20
+    healthcheck:
+      test: ["CMD", "/usr/bin/healthcheck", "--config", "/app/"]
+      interval: 10s
+      timeout: 10s
+      retries: 3
+    environment:
+    - PUID=${DECYPHARR_UID}
+    - PGID=${MEDIACENTER_GID}
+    - UMASK=002
+    - TZ=${TIMEZONE}
+    tmpfs:
+    - /tmp:mode=770,noexec,size=100M,uid=${DECYPHARR_UID},gid=${MEDIACENTER_GID}
+    ports:
+    - ${DECYPHARR_PORT}:8282
+    labels:
+    - traefik.enable=true
+    - traefik.http.routers.decypharr.rule=Host(`decypharr.${DOMAIN_NAME}`)
+    - traefik.http.routers.decypharr.entrypoints=web
+    - traefik.http.services.decypharr.loadbalancer.server.port=8282
+    volumes:
+    # Config directory
+    - ${ROOT_DIR}/config/decypharr-config:/app
+    # Data directory (same as RDT Client for compatibility)
+    - ${ROOT_DIR}/data:/data
+    # Symlinks directory
+    - ${ROOT_DIR}/data/symlinks:/data/symlinks:rw
+    # Mount propagation for FUSE
+    - /mnt/mediacenter:/mnt/mediacenter:rshared
+    restart: on-failure:5
+    devices:
+    - /dev/fuse:/dev/fuse:rwm
+    cap_add:
+    - SYS_ADMIN
+    security_opt:
+    - apparmor:unconfined
+    depends_on:
+      zurg:
+        condition: service_healthy
+        restart: true
+      rclone:
+        condition: service_healthy
+        restart: true
+    logging:
+      driver: local
+      options:
+        max-file: '5'
+        max-size: 10m

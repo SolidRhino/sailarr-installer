@@ -1,0 +1,31 @@
+# Zurg - Real-Debrid WebDAV
+
+services:
+  zurg:
+    image: ${ZURG_IMAGE}:${ZURG_TAG}
+    env_file:
+      - ../.env.defaults
+      - ../.env.local
+    container_name: zurg
+    cpus: 1.5
+    restart: on-failure:5
+    networks:
+      mediacenter:
+        ipv4_address: 172.30.0.5
+    healthcheck:
+      test: curl -f localhost:9999/dav/version.txt || exit 1
+    logging:
+      driver: local
+      options:
+        max-file: '3'
+        max-size: 10m
+    ports:
+    - ${ZURG_PORT}:9999
+    labels:
+    - traefik.enable=true
+    - traefik.http.routers.zurg.rule=Host(`${ZURG_TRAEFIK_NAME}.${DOMAIN_NAME}`)
+    - traefik.http.routers.zurg.entrypoints=web
+    - traefik.http.services.zurg.loadbalancer.server.port=9999
+    volumes:
+    - ${ROOT_DIR}/config/zurg-config/config.yml:/app/config.yml
+    - zurg_data:/app/data

@@ -1,0 +1,49 @@
+# Rclone - Mount Real-Debrid Storage
+
+services:
+  rclone:
+    image: ${RCLONE_IMAGE}:${RCLONE_TAG}
+    env_file:
+      - ../.env.defaults
+      - ../.env.local
+    container_name: rclone
+    cpus: 3.0
+    restart: on-failure:5
+    networks:
+      mediacenter:
+        ipv4_address: 172.30.0.6
+    logging:
+      driver: local
+      options:
+        max-file: '3'
+        max-size: 10m
+    environment:
+    - PUID=${RCLONE_UID}
+    - PGID=${MEDIACENTER_GID}
+    - TZ=${TIMEZONE}
+    - UMASK=002
+    volumes:
+    - ${ROOT_DIR}/data/realdebrid-zurg:/data:rshared
+    - ${ROOT_DIR}/rclone.conf:/config/rclone/rclone.conf
+    cap_add:
+    - SYS_ADMIN
+    security_opt:
+    - apparmor:unconfined
+    devices:
+    - /dev/fuse:/dev/fuse:rwm
+    healthcheck:
+      test: sh -c "[ -f /data/version.txt ] && mountpoint -q /data && test -w /data"
+      interval: 10s
+      retries: 5
+      start_period: 30s
+      timeout: 10s
+    depends_on:
+      zurg:
+        condition: service_healthy
+        restart: true
+    command: 'mount zurg: /data --allow-non-empty --allow-other --async-read=true
+      --timeout=10m --log-level=INFO --uid=${RCLONE_UID} --gid=${MEDIACENTER_GID}
+      --umask=002 --dir-cache-time=15s --poll-interval=15s --buffer-size=48M --vfs-cache-mode=full
+      --vfs-read-ahead=96M --vfs-read-chunk-size=32M --vfs-read-chunk-size-limit=32M
+      --vfs-cache-max-age=672h --vfs-cache-poll-interval=15s --vfs-cache-max-size=5G
+      --vfs-fast-fingerprint --vfs-refresh'

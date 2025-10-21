@@ -1,0 +1,36 @@
+# Zilean - Torrent Indexer
+
+services:
+  zilean:
+    image: ${ZILEAN_IMAGE}:${ZILEAN_TAG}
+    env_file:
+      - ../.env.defaults
+      - ../.env.local
+    container_name: zilean
+    tty: true
+    networks:
+      mediacenter:
+        ipv4_address: 172.30.0.14
+    volumes:
+    - ${ROOT_DIR}/config/zilean-config:/app/data
+    - zilean_tmp:/tmp
+    ports:
+    - ${ZILEAN_PORT}:8181
+    restart: unless-stopped
+    healthcheck:
+      test: curl --connect-timeout 10 --silent --show-error --fail http://localhost:8181/healthchecks/ping
+      timeout: 60s
+      interval: 30s
+      retries: 10
+    labels:
+    - traefik.enable=true
+    - traefik.http.routers.zilean.rule=Host(`${ZILEAN_TRAEFIK_NAME}.${DOMAIN_NAME}`)
+    - traefik.http.routers.zilean.entrypoints=web
+    - traefik.http.services.zilean.loadbalancer.server.port=8181
+    depends_on:
+      zilean-postgres:
+        condition: service_healthy
+        restart: true
+      prowlarr:
+        condition: service_healthy
+        restart: true

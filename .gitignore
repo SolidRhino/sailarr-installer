@@ -1,0 +1,38 @@
+# MediaCenter - Git Ignore File
+
+# Production directories with sensitive data
+config/
+data/
+logs/
+
+# Installation artifacts
+.env.install
+*.tar.gz
+*.tar
+*.zip
+
+# Backup files
+*.bak
+*.backup
+*~
+
+# Temporary files
+*.tmp
+/tmp/
+
+# OS files
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+
+# Editor files
+.vscode/
+.idea/
+*.iml
+
+# Docker runtime
+.docker/
+
+# Logs
+*.log

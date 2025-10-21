@@ -1,0 +1,44 @@
+# Autoscan - Plex Library Updates
+
+services:
+  autoscan:
+    image: ${AUTOSCAN_IMAGE}:${AUTOSCAN_TAG}
+    env_file:
+      - ../.env.defaults
+      - ../.env.local
+    container_name: autoscan
+    cpu_count: 1
+    mem_limit: 256M
+    memswap_limit: 256M
+    networks:
+      mediacenter:
+        ipv4_address: 172.30.0.13
+    healthcheck:
+      test: ["CMD-SHELL", "test -f /config/config.yml && pgrep autoscan || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 4
+      start_period: 60s
+    environment:
+    - PUID=${AUTOSCAN_UID}
+    - PGID=${MEDIACENTER_GID}
+    - AUTOSCAN_VERBOSITY=0
+    - UMASK=002
+    tmpfs:
+    - /tmp:mode=770,noexec,size=30M,uid=${AUTOSCAN_UID},gid=${MEDIACENTER_GID}
+    - /config/logs:mode=770,size=30M,uid=${AUTOSCAN_UID},gid=${MEDIACENTER_GID}
+    volumes:
+    - ${ROOT_DIR}/config/autoscan-config:/config
+    - ${ROOT_DIR}/data:/data:ro
+    ports:
+    - ${AUTOSCAN_PORT}:3030
+    restart: on-failure:5
+    logging:
+      driver: local
+      options:
+        max-file: '3'
+        max-size: 5m
+    depends_on:
+      plex:
+        condition: service_healthy
+        restart: true
