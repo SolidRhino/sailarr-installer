@@ -17,7 +17,7 @@ This installer deploys a complete media automation stack that streams content fr
 
 - **Server:** Ubuntu 20.04+ or Debian 11+ (8GB RAM minimum, 16GB recommended)
 - **Real-Debrid:** Active subscription with [API token](https://real-debrid.com/apitoken)
-- **Docker:** Will be installed automatically if not present
+- **Docker & Docker Compose:** Must be installed before running the installer
 - **Storage:** 50GB+ available disk space
 
 ## Quick Start
@@ -28,7 +28,7 @@ git clone https://github.com/JaviPege/sailarr-installer.git
 cd sailarr-installer
 
 # Run the installer
-sudo ./setup.sh
+./setup.sh
 ```
 
 The installer will ask you four questions:
@@ -38,6 +38,8 @@ The installer will ask you four questions:
 4. Download client preference (RDTClient or Decypharr)
 
 Then it handles everything else automatically.
+
+**📖 For detailed installation instructions, see [INSTALLATION.md](INSTALLATION.md)** - This guide explains each configuration option, what happens during installation, and how to troubleshoot common issues.
 
 ## What Gets Installed
 
@@ -74,10 +76,10 @@ No actual downloading to local storage - everything streams from Real-Debrid.
 ## What the Installer Does
 
 ### 1. System Preparation
-- Installs Docker and Docker Compose if needed
 - Creates directory structure with correct permissions
 - Configures users and groups per Servarr Wiki best practices
 - Sets up file permissions (775/664, umask 002) for proper hardlinking
+- Generates configuration files from templates
 
 ### 2. Service Deployment
 - Deploys all containers via Docker Compose
