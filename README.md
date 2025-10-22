@@ -321,18 +321,23 @@ cd /YOUR_INSTALL_DIR/docker
 ```bash
 cd /YOUR_INSTALL_DIR/docker
 
-# Start all services
-docker compose up -d
+# Start all services (without Traefik)
+docker compose --env-file .env.defaults --env-file .env.local up -d
+
+# Start all services (with Traefik if enabled)
+docker compose --env-file .env.defaults --env-file .env.local --profile traefik up -d
 
 # Stop all services
-docker compose down
+docker compose --env-file .env.defaults --env-file .env.local down
 
 # Restart all services
-docker compose restart
+docker compose --env-file .env.defaults --env-file .env.local restart
 
 # Restart a specific service
 docker restart <container_name>
 ```
+
+**Note:** The helper scripts automatically handle environment files and profiles, making them easier to use.
 
 ### Health Monitoring
 
@@ -370,16 +375,23 @@ Watchtower is installed by default and automatically updates containers. To manu
 
 ```bash
 cd /YOUR_INSTALL_DIR/docker
-docker compose pull
-docker compose up -d
+
+# Using helper script (recommended)
+./pull.sh
+./up.sh
+
+# Or using docker compose directly
+docker compose --env-file .env.defaults --env-file .env.local pull
+docker compose --env-file .env.defaults --env-file .env.local up -d
 ```
 
 ### View Logs
 
 ```bash
-# All containers
 cd /YOUR_INSTALL_DIR/docker
-docker compose logs -f
+
+# All containers
+docker compose --env-file .env.defaults --env-file .env.local logs -f
 
 # Specific container
 docker logs -f <container_name>
