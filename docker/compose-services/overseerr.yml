@@ -7,7 +7,7 @@ services:
       - ../.env.defaults
       - ../.env.local
     container_name: overseerr
-    cpus: 0.5
+    
     user: ${OVERSEERR_UID}:${MEDIACENTER_GID}
     networks:
       mediacenter:

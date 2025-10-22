@@ -7,7 +7,7 @@ services:
       - ../.env.defaults
       - ../.env.local
     container_name: pinchflat
-    cpus: 0.5
+    
     user: ${PINCHFLAT_UID}:${MEDIACENTER_GID}
     networks:
       mediacenter:

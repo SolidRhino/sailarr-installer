@@ -28,4 +28,4 @@ services:
       plex:
         condition: service_healthy
         restart: true
-    cpus: '0.4'
+    

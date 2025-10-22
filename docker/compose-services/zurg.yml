@@ -7,7 +7,7 @@ services:
       - ../.env.defaults
       - ../.env.local
     container_name: zurg
-    cpus: 1.5
+    
     restart: on-failure:5
     networks:
       mediacenter:

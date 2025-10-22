@@ -7,7 +7,7 @@ services:
       - ../.env.defaults
       - ../.env.local
     container_name: radarr
-    cpus: 1.0
+    
     user: ${RADARR_UID}:${MEDIACENTER_GID}
     networks:
       mediacenter:

@@ -7,7 +7,7 @@ services:
       - ../.env.defaults
       - ../.env.local
     container_name: rdtclient
-    cpus: 1.0
+    
     networks:
       mediacenter:
         ipv4_address: 172.30.0.7

@@ -7,7 +7,7 @@ services:
       - ../.env.defaults
       - ../.env.local
     container_name: rclone
-    cpus: 3.0
+    
     restart: on-failure:5
     networks:
       mediacenter:

@@ -7,7 +7,7 @@ services:
       - ../.env.defaults
       - ../.env.local
     container_name: prowlarr
-    cpus: 0.5
+    
     networks:
       mediacenter:
         ipv4_address: 172.30.0.10

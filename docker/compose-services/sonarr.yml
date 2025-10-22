@@ -7,7 +7,7 @@ services:
       - ../.env.defaults
       - ../.env.local
     container_name: sonarr
-    cpus: 1.0
+    
     user: ${SONARR_UID}:${MEDIACENTER_GID}
     networks:
       mediacenter:
