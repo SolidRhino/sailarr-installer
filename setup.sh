@@ -668,9 +668,24 @@ echo ""
 if [[ $REPLY =~ ^[Yy]$ ]]; then
     echo "Installing mount healthcheck scripts..."
 
-    # Copy healthcheck scripts to /usr/local/bin/
-    sudo cp "$SCRIPT_DIR/arrs-mount-healthcheck.sh" /usr/local/bin/
-    sudo cp "$SCRIPT_DIR/plex-mount-healthcheck.sh" /usr/local/bin/
+    # Create .mediacenter.env config file in user's home directory
+    echo "Creating ${HOME}/.mediacenter.env configuration file..."
+    cat > "${HOME}/.mediacenter.env" <<EOF
+# Mediacenter environment configuration
+# Generated on $(date)
+ROOT_DIR=${ROOT_DIR}
+EOF
+    chmod 644 "${HOME}/.mediacenter.env"
+    echo "✓ Configuration file created: ${HOME}/.mediacenter.env"
+
+    # Copy healthcheck scripts to /usr/local/bin/ and replace hardcoded paths
+    echo "Copying healthcheck scripts with configured paths..."
+    
+    # Replace hardcoded /mediacenter paths with actual ROOT_DIR in arrs script
+    sed "s|/mediacenter|${ROOT_DIR}|g" "$SCRIPT_DIR/arrs-mount-healthcheck.sh" | sudo tee /usr/local/bin/arrs-mount-healthcheck.sh > /dev/null
+    
+    # Replace hardcoded /mediacenter paths with actual ROOT_DIR in plex script
+    sed "s|/mediacenter|${ROOT_DIR}|g" "$SCRIPT_DIR/plex-mount-healthcheck.sh" | sudo tee /usr/local/bin/plex-mount-healthcheck.sh > /dev/null
 
     # Set permissions
     sudo chmod 775 /usr/local/bin/arrs-mount-healthcheck.sh
@@ -685,15 +700,15 @@ if [[ $REPLY =~ ^[Yy]$ ]]; then
     # Note: Test file will be created after rclone mounts
     INSTALL_HEALTHCHECK_FILES=true
 
-    echo "✓ Healthcheck scripts installed successfully"
+    echo "✓ Healthcheck scripts installed successfully with ROOT_DIR=${ROOT_DIR}"
     echo ""
     read -p "Do you want to add cron jobs for automatic healthchecks? (y/n): " -r
     echo ""
 
     if [[ $REPLY =~ ^[Yy]$ ]]; then
         # Add cron jobs if they don't already exist
-        (crontab -l 2>/dev/null | grep -v "arrs-mount-healthcheck"; echo "*/30 * * * * /usr/local/bin/arrs-mount-healthcheck.sh") | crontab -
-        (crontab -l 2>/dev/null | grep -v "plex-mount-healthcheck"; echo "*/35 * * * * /usr/local/bin/plex-mount-healthcheck.sh") | crontab -
+        (crontab -l 2>/dev/null | grep -v "arrs-mount-healthcheck"; echo "*/30 * * * * source ${HOME}/.mediacenter.env && /usr/local/bin/arrs-mount-healthcheck.sh") | crontab -
+        (crontab -l 2>/dev/null | grep -v "plex-mount-healthcheck"; echo "*/35 * * * * source ${HOME}/.mediacenter.env && /usr/local/bin/plex-mount-healthcheck.sh") | crontab -
         echo "✓ Cron jobs added successfully"
     else
         echo "Skipping cron job configuration. You can add them manually later:"

@@ -3,9 +3,17 @@
 # Verifies that Plex can access the rclone mount
 # If not, restarts the container
 
-LOG_FILE="/mediacenter/logs/plex-mount-healthcheck.log"
+# Source environment variables
+if [ -f "${HOME}/.mediacenter.env" ]; then
+    source "${HOME}/.mediacenter.env"
+else
+    echo "ERROR: ${HOME}/.mediacenter.env not found"
+    exit 1
+fi
+
+LOG_FILE="${ROOT_DIR}/logs/plex-mount-healthcheck.log"
 TEST_FILE="/data/realdebrid-zurg/torrents/.healthcheck_test.txt"
-DOCKER_COMPOSE_DIR="/mediacenter/docker"
+DOCKER_COMPOSE_DIR="${ROOT_DIR}/docker"
 
 log() {
     echo "[$(date '+%Y-%m-%d %H:%M:%S')] $1" | tee -a "$LOG_FILE"
