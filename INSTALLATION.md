@@ -338,6 +338,11 @@ Access URLs depend on whether you enabled Traefik or not.
 - **Overseerr:** `http://YOUR_SERVER_IP:5055`
 - **Zilean:** `http://YOUR_SERVER_IP:8181`
 - **Decypharr:** `http://YOUR_SERVER_IP:8283`
+- **Tautulli:** `http://YOUR_SERVER_IP:8282`
+- **Homarr:** `http://YOUR_SERVER_IP:7575`
+- **Dashdot:** `http://YOUR_SERVER_IP:3001`
+- **Pinchflat:** `http://YOUR_SERVER_IP:8945`
+- **Autoscan:** `http://YOUR_SERVER_IP:3030`
 
 Replace `YOUR_SERVER_IP` with your server's IP address.
 
@@ -352,6 +357,10 @@ All services are accessible via subdomains:
 - **Overseerr:** `https://overseerr.YOUR_DOMAIN`
 - **Zilean:** `https://zilean.YOUR_DOMAIN`
 - **Decypharr:** `https://decypharr.YOUR_DOMAIN`
+- **Tautulli:** `https://tautulli.YOUR_DOMAIN`
+- **Homarr:** `https://homarr.YOUR_DOMAIN`
+- **Dashdot:** `https://dashdot.YOUR_DOMAIN`
+- **Pinchflat:** `https://pinchflat.YOUR_DOMAIN`
 - **Traefik Dashboard:** `https://traefik.YOUR_DOMAIN`
 
 Replace `YOUR_DOMAIN` with the domain you configured during installation.

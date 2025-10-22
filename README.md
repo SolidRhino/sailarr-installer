@@ -119,10 +119,11 @@ After installation, access your services at different URLs depending on your con
 - **Overseerr:** `http://SERVER_IP:5055`
 - **Zilean:** `http://SERVER_IP:8181`
 - **Decypharr:** `http://SERVER_IP:8283`
-- **Tautulli:** `http://SERVER_IP:8181`
+- **Tautulli:** `http://SERVER_IP:8282`
 - **Homarr:** `http://SERVER_IP:7575`
 - **Dashdot:** `http://SERVER_IP:3001`
 - **Pinchflat:** `http://SERVER_IP:8945`
+- **Autoscan:** `http://SERVER_IP:3030`
 
 Replace `SERVER_IP` with your actual server IP address or hostname.
 
@@ -293,6 +294,56 @@ tail -f /YOUR_INSTALL_DIR/logs/arrs-mount-healthcheck.log
 **Traefik 404 errors:** Ensure DNS is pointing to your server and containers are healthy
 
 ## Maintenance
+
+### Managing Services
+
+The installation provides convenient scripts for managing all services:
+
+```bash
+cd /YOUR_INSTALL_DIR/docker
+
+# Start all services
+docker compose up -d
+
+# Stop all services
+docker compose down
+
+# Restart all services
+docker compose restart
+
+# Restart a specific service
+docker restart <container_name>
+```
+
+### Health Monitoring
+
+The installer sets up automatic health checks that monitor critical mounts:
+
+**How it works:**
+- **Plex health check:** Runs every 35 minutes, verifies `/data/realdebrid-zurg` is accessible
+- **Arrs health check:** Runs every 30 minutes, verifies mounts for Radarr, Sonarr, and Decypharr
+- **Auto-recovery:** If a mount fails, the affected container is automatically restarted
+- **Logging:** All checks are logged to `/YOUR_INSTALL_DIR/logs/`
+
+**View health check logs:**
+```bash
+# Plex mount health
+tail -f /YOUR_INSTALL_DIR/logs/plex-mount-healthcheck.log
+
+# Arrs mount health
+tail -f /YOUR_INSTALL_DIR/logs/arrs-mount-healthcheck.log
+```
+
+**Check cron jobs:**
+```bash
+crontab -l | grep healthcheck
+```
+
+**Manually run health checks:**
+```bash
+/YOUR_INSTALL_DIR/plex-mount-healthcheck.sh
+/YOUR_INSTALL_DIR/arrs-mount-healthcheck.sh
+```
 
 ### Update Containers
 
