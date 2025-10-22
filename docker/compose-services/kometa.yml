@@ -1,0 +1,39 @@
+---
+# Kometa - Plex Meta Manager
+# https://kometa.wiki/
+services:
+  kometa:
+    image: ${KOMETA_IMAGE:-lscr.io/linuxserver/kometa}:${KOMETA_TAG:-latest}
+    container_name: kometa
+    hostname: kometa
+    env_file:
+      - ../.env.defaults
+      - ../.env.local
+    networks:
+      mediacenter:
+        ipv4_address: 172.30.0.22
+    environment:
+      - PUID=${KOMETA_UID}
+      - PGID=${MEDIACENTER_GID}
+      - TZ=${TIMEZONE}
+      - UMASK=002
+      - KOMETA_RUN=${KOMETA_RUN:-false}
+      - KOMETA_TIME=${KOMETA_TIME}
+    volumes:
+      - ${ROOT_DIR}/config/kometa-config:/config
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "test -f /config/config.yml || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+    logging:
+      driver: "local"
+      options:
+        max-file: "3"
+        max-size: "10m"
+    depends_on:
+      plex:
+        condition: service_healthy
+        restart: true

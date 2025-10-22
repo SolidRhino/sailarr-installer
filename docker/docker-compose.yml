@@ -43,6 +43,7 @@ include:
   # Additional Services
   - compose-services/pinchflat.yml
   - compose-services/plextraktsync.yml
+  - compose-services/kometa.yml
   - compose-services/tautulli.yml
   
   # Dashboard & Monitoring
