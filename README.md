@@ -61,7 +61,7 @@ The stack includes these services, configured based on your selections:
 
 **Note:** RDTClient is available in the compose files as legacy support but is not configured by the installer.
 
-### Additional Services
+### Additional Services (Always Installed)
 
 - **[Watchtower](https://containrrr.dev/watchtower/)** - Automatic container updates
 - **[Tautulli](https://tautulli.com/)** - Plex monitoring and statistics
@@ -245,6 +245,10 @@ cd /YOUR_INSTALL_DIR
 │   └── realdebrid-zurg/ # Rclone mount point
 ├── logs/              # Health check logs
 ├── docker/            # Docker Compose files
+│   ├── up.sh         # Start all services
+│   ├── down.sh       # Stop all services
+│   ├── restart.sh    # Restart all services
+│   └── compose files...
 ├── setup.sh           # Installation script
 ├── recyclarr.yml      # TRaSH Guide configuration
 ├── recyclarr-sync.sh  # Manual profile update script
@@ -299,6 +303,21 @@ tail -f /YOUR_INSTALL_DIR/logs/arrs-mount-healthcheck.log
 
 The installation provides convenient scripts for managing all services:
 
+**Using helper scripts (recommended):**
+```bash
+cd /YOUR_INSTALL_DIR/docker
+
+# Start all services
+./up.sh
+
+# Stop all services
+./down.sh
+
+# Restart all services
+./restart.sh
+```
+
+**Using docker compose directly:**
 ```bash
 cd /YOUR_INSTALL_DIR/docker
 
@@ -347,13 +366,13 @@ crontab -l | grep healthcheck
 
 ### Update Containers
 
+Watchtower is installed by default and automatically updates containers. To manually update:
+
 ```bash
 cd /YOUR_INSTALL_DIR/docker
 docker compose pull
 docker compose up -d
 ```
-
-Or enable Watchtower during installation for automatic updates.
 
 ### View Logs
 
